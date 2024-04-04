@@ -1,4 +1,5 @@
 ﻿using chatappBackend.User;
+using chatappBackend.ContactList;
 using Microsoft.EntityFrameworkCore;
 
 namespace chatappBackend.Data
@@ -8,5 +9,6 @@ namespace chatappBackend.Data
         public UserDataContext(DbContextOptions<UserDataContext> options) : base(options) { }
 
         public DbSet<Users> Users => Set<Users>();
+        public DbSet<ContactsList> ContactList => Set<ContactsList>();
     }
 }

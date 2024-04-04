@@ -45,7 +45,7 @@ namespace chatappBackend.User.LoginUser
                     return BadRequest("Wrong password");
                 }
                 string token = GenerateToken(userToCheck, g);
-                return Ok();
+                return Ok(userToCheck);
             }
         }
         private bool VerifyPassword(string password, byte[] passwordHash, byte[] passwordSalt)
