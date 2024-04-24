@@ -1,5 +1,6 @@
 ﻿using chatappBackend.Data;
 using chatappBackend.User.CreateUser;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -12,17 +13,21 @@ using System.Text;
 
 namespace chatappBackend.User.LoginUser
 {
+    [AllowAnonymous]
     [Route("api/User/Login")]
     [ApiController]
     public class UserLogin : ControllerBase
     {
         private const string TokenSecretKey = "Aleksander51HaHaXDbekazwasxDxDnienawidzewas";
 
+        private readonly ILogger<UserLogin> _logger;
+
         private readonly UserDataContext _context;
 
-        public UserLogin(UserDataContext context)
+        public UserLogin(UserDataContext context, ILogger<UserLogin> logger)
         {
             _context = context;
+            _logger = logger;
         }
         [HttpPost]
         public async Task<ActionResult<string>> Login(UserPostRequest user)
@@ -38,13 +43,16 @@ namespace chatappBackend.User.LoginUser
                 var userToCheck = _context.Users.Where(x => x.UserName == user.Username).FirstOrDefault();
                 if (userToCheck == null)
                 {
+                    _logger.LogInformation($"Someone tried to login with username {userToCheck.UserName}, but this user doesn't exist.");
                     return BadRequest("User doesn't exist");
                 }
                 if (!VerifyPassword(user.Password, userToCheck.Hash, userToCheck.Salt))
                 {
+                    _logger.LogInformation($"User with username {userToCheck.UserName} tried to login, but his password was wrong");
                     return BadRequest("Wrong password");
                 }
                 string token = GenerateToken(userToCheck, g);
+                _logger.LogInformation($"User {userToCheck.UserName} successfully logged in");
                 return Ok(userToCheck);
             }
         }
@@ -66,12 +74,15 @@ namespace chatappBackend.User.LoginUser
             {
                 new("UserName", request.UserName),
                 new("ClientId", request.Id.ToString()),
-                new("X-CSRF-TOKEN", g.ToString())
+                new("X-CSRF-TOKEN", g.ToString()),
+                new(ClaimTypes.Role, request.Role),
             };
 
             var TokenSettings = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
+                Audience = "http://localhost:7094/",
+                Issuer = "http://localhost:7094/",
                 Expires = DateTime.Now.AddMinutes(20),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
             };

@@ -2,6 +2,7 @@
 {
     public class ContactGetRequest
     {
-        public int LoggedUserId { get; set; }
+        public Guid LoggedUserId { get; set; }
+        public string Guid { get; set; }
     }
 }

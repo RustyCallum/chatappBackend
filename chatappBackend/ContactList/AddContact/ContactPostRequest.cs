@@ -2,7 +2,8 @@
 {
     public class ContactPostRequest
     {
-        public int LoggedUserId { get; set; }
-        public int SecondaryUserId { get; set; }
+        public Guid LoggedUserId { get; set; }
+        public Guid SecondaryUserId { get; set; }
+        public string Guid { get; set; }
     }
 }

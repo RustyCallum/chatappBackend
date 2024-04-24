@@ -2,8 +2,8 @@
 {
     public class ContactsList
     {
-        public int Id { get; set; }
-        public int LoggedUserId { get; set; }
-        public int SecondaryUserId { get; set; }
+        public Guid Id { get; set; }
+        public Guid LoggedUserId { get; set; }
+        public Guid SecondaryUserId { get; set; }
     }
 }
